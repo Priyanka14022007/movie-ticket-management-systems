@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CineMetrics</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <div class="brand"><div class="mark">C</div>Cine<span class="accent">Metrics</span></div>
+    <nav class="nav">
+      <a href="#" data-view="home" class="active">Home</a>
+      <a href="#" data-view="catalog">Catalog</a>
+      <a href="#" data-view="analytics">Analytics</a>
+    </nav>
+    <div class="header-actions">
+      <span class="pill pill-live"><span class="dot"></span> <span id="wsStatus">Live</span></span>
+      <button class="icon-btn" id="themeToggle" title="Toggle theme">&#9789;</button>
+      <button class="btn btn-ghost" id="authBtn">Sign in</button>
+    </div>
+  </div>
+</header>
+
+<!-- HOME -->
+<section class="view active" id="view-home">
+  <div class="hero container">
+    <div class="eyebrow" id="movieCount">100 films · one clear view</div>
+    <h1>Find the story behind the <span class="accent">numbers.</span></h1>
+    <p>A living catalog and analysis desk for a movie dataset. Explore what gets watched, what gets made, book your seat, and watch the desk update in real time.</p>
+    <div class="actions">
+      <button class="btn btn-primary" data-view="catalog">Explore the catalog</button>
+      <button class="btn" data-view="analytics">Open analysis desk</button>
+    </div>
+  </div>
+</section>
+
+<!-- CATALOG -->
+<section class="view" id="view-catalog">
+  <div class="container section">
+    <div class="section-head">
+      <div class="kicker">THE LIBRARY</div>
+      <h2>The full picture.</h2>
+      <p>Search, sort and narrow the dataset until the right stories surface.</p>
+    </div>
+    <div class="catalog-layout">
+      <aside class="filters">
+        <label>Search the dataset</label>
+        <input id="fSearch" placeholder="Title, director...">
+        <label>Genre</label>
+        <select id="fGenre"><option value="">All genres</option></select>
+        <label>Language</label>
+        <select id="fLanguage"><option value="">All languages</option></select>
+        <label>OTT platform</label>
+        <select id="fPlatform"><option value="">All platforms</option></select>
+        <label>Minimum rating</label>
+        <select id="fRating">
+          <option value="">Any rating</option>
+          <option value="6">6+</option><option value="7">7+</option>
+          <option value="8">8+</option><option value="9">9+</option>
+        </select>
+        <label>Sort by</label>
+        <select id="fSort">
+          <option value="imdb_rating">IMDb rating</option>
+          <option value="year">Year</option>
+          <option value="box_office">Box office</option>
+          <option value="title">Title</option>
+        </select>
+      </aside>
+      <div>
+        <div class="catalog-top"><span id="resultCount">- films in view</span></div>
+        <div class="grid" id="movieGrid"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ANALYTICS -->
+<section class="view" id="view-analytics">
+  <div class="container section">
+    <div class="section-head">
+      <div class="kicker">ANALYSIS DESK</div>
+      <h2>Where the story becomes a signal.</h2>
+      <p>Recalculated on every filter, every booking - the dashboard keeps up with what's happening right now.</p>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="label">Movies tracked</div><div class="value" id="statMovies">-</div><div class="sub">of dataset</div></div>
+      <div class="stat-card"><div class="label">Average IMDb</div><div class="value" id="statRating">-</div><div class="sub">across current view</div></div>
+      <div class="stat-card"><div class="label">Tickets sold (live)</div><div class="value" id="statTickets">-</div><div class="sub" id="statRevenue">$0 revenue</div></div>
+      <div class="stat-card"><div class="label">Box office</div><div class="value" id="statBox">-</div><div class="sub">total tracked revenue</div></div>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-card"><div class="kicker">COMPOSITION</div><h3>Movies by genre</h3><canvas id="chartGenre"></canvas></div>
+      <div class="chart-card"><div class="kicker">TIMELINE</div><h3>Release year momentum</h3><canvas id="chartYear"></canvas></div>
+      <div class="chart-card"><div class="kicker">GLOBAL LENS</div><h3>Language distribution</h3><canvas id="chartLang"></canvas></div>
+      <div class="chart-card"><div class="kicker">AUDIENCE PULSE</div><h3>IMDb rating distribution</h3><canvas id="chartRatingDist"></canvas></div>
+      <div class="chart-card"><div class="kicker">ECONOMICS</div><h3>Budget vs. box office</h3><canvas id="chartBudget"></canvas></div>
+      <div class="chart-card"><div class="kicker">QUALITY INDEX</div><h3>Average rating by genre</h3><canvas id="chartGenreRating"></canvas></div>
+      <div class="chart-card"><div class="kicker">BOX OFFICE OF SEATS</div><h3>Tickets sold by section</h3><canvas id="chartSection"></canvas></div>
+      <div class="chart-card"><div class="kicker">LIVE</div><h3>Top selling movies</h3><canvas id="chartTopSelling"></canvas></div>
+    </div>
+  </div>
+</section>
+
+<!-- BOOKING -->
+<section class="view" id="view-booking">
+  <div class="container section">
+    <div class="section-head">
+      <div class="kicker" id="bookMovieMeta">BOOK TICKETS</div>
+      <h2 id="bookMovieTitle">-</h2>
+      <p>Pick your seats. Bookings update for every open tab/window the instant they happen.</p>
+    </div>
+    <div class="booking-wrap">
+      <div>
+        <div class="screen-bar"></div>
+        <div class="screen">S C R E E N</div>
+        <div id="seatMap"></div>
+        <div class="legend">
+          <span><span class="sw" style="background:var(--bg-elevated);border:1px solid var(--border)"></span>Available</span>
+          <span><span class="sw" style="background:var(--accent)"></span>Selected</span>
+          <span><span class="sw" style="background:var(--text-dim)"></span>Booked</span>
+        </div>
+      </div>
+      <div class="booking-summary">
+        <h3>Your seats</h3>
+        <div id="summarySeats" style="color:var(--text-muted);font-size:14px;">None selected yet</div>
+        <div class="row"><span>Ticket price</span><span id="summaryPrice">$0.00</span></div>
+        <div class="total"><span>Total: </span><span id="summaryTotal">$0.00</span></div>
+        <button class="btn btn-primary" id="confirmBooking" style="width:100%;margin-top:16px;">Confirm booking</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">CineMetrics - real-time seat booking and analytics, running entirely in your browser (no server, no database).</footer>
+
+<!-- AUTH MODAL -->
+<div class="modal-backdrop" id="authModal">
+  <div class="modal">
+    <button class="close" id="closeAuth">&times;</button>
+    <h3 id="authTitle">Sign in</h3>
+    <div class="error" id="authError"></div>
+    <input id="authUsername" placeholder="Username">
+    <input id="authPassword" type="password" placeholder="Password">
+    <button class="btn btn-primary" id="authSubmit" style="width:100%;">Sign in</button>
+    <div class="switch">New here? <a href="#" id="authSwitch">Create an account</a></div>
+    <div class="switch" style="margin-top:6px;color:var(--text-dim);">Admin demo: admin / admin123</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span class="sw"></span><span id="toastMsg"></span></div>
+
+<script src="app.js"></script>
+</body>
+</html>
